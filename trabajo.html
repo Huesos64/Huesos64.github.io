@@ -51,6 +51,14 @@
         button:hover {
             background-color: #d32f2f;
         }
+        .viewer {
+            margin-top: 20px;
+        }
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+        }
     </style>
 </head>
 <body>
@@ -60,10 +68,10 @@
             <label for="sectionSelect">Selecciona la Sección:</label>
             <select id="sectionSelect" required>
                 <option value="">Selecciona una sección</option>
-                <option value="Finanzas">UNIVERSIDAD</option>
-                <option value="Recursos Humanos">TRABAJO</option>
-                <option value="Proyectos">PERSONAL</option>
-                <option value="Legal">VARIOS</option>
+                <option value="Finanzas">Finanzas</option>
+                <option value="Recursos Humanos">Recursos Humanos</option>
+                <option value="Proyectos">Proyectos</option>
+                <option value="Legal">Legal</option>
             </select>
 
             <label for="documentInput">Subir Documento:</label>
@@ -83,10 +91,16 @@
                 <!-- Los documentos subidos aparecerán aquí -->
             </tbody>
         </table>
+
+        <div class="viewer" id="documentViewer">
+            <!-- El documento seleccionado se mostrará aquí -->
+            <iframe id="viewerFrame" src="" hidden></iframe>
+        </div>
     </div>
 
     <script>
         const documentTableBody = document.getElementById('documentTableBody');
+        const viewerFrame = document.getElementById('viewerFrame');
 
         // Cargar documentos guardados de LocalStorage al cargar la página
         window.onload = function() {
@@ -129,9 +143,11 @@
             // Columna del nombre del documento
             const nameCell = document.createElement('td');
             const link = document.createElement('a');
-            link.href = documentData.url;
+            link.href = '#';
             link.textContent = documentData.name;
-            link.download = documentData.name;
+            link.onclick = function() {
+                showDocument(documentData.url);
+            };
             nameCell.appendChild(link);
 
             // Columna de la sección
@@ -155,6 +171,12 @@
 
             // Agregar la fila a la tabla
             documentTableBody.appendChild(row);
+        }
+
+        // Función para mostrar un documento en el visor (iframe)
+        function showDocument(url) {
+            viewerFrame.src = url;
+            viewerFrame.hidden = false;
         }
 
         // Función para guardar un documento en LocalStorage
