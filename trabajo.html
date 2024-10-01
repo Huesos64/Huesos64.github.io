@@ -60,10 +60,10 @@
             <label for="sectionSelect">Selecciona la Sección:</label>
             <select id="sectionSelect" required>
                 <option value="">Selecciona una sección</option>
-                <option value="Finanzas">Finanzas</option>
-                <option value="Recursos Humanos">Recursos Humanos</option>
-                <option value="Proyectos">Proyectos</option>
-                <option value="Legal">Legal</option>
+                <option value="Finanzas">UNIVERSIDAD</option>
+                <option value="Recursos Humanos">TRABAJO</option>
+                <option value="Proyectos">PERSONAL</option>
+                <option value="Legal">VARIOS</option>
             </select>
 
             <label for="documentInput">Subir Documento:</label>
@@ -86,6 +86,13 @@
     </div>
 
     <script>
+        const documentTableBody = document.getElementById('documentTableBody');
+
+        // Cargar documentos guardados de LocalStorage al cargar la página
+        window.onload = function() {
+            loadDocumentsFromStorage();
+        };
+
         document.getElementById('uploadForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const fileInput = document.getElementById('documentInput');
@@ -94,37 +101,18 @@
             const selectedSection = sectionSelect.value;
 
             if (file && selectedSection) {
-                const tableBody = document.getElementById('documentTableBody');
-                const row = document.createElement('tr');
-
-                // Columna del nombre del documento
-                const nameCell = document.createElement('td');
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(file);
-                link.textContent = file.name;
-                link.download = file.name;
-                nameCell.appendChild(link);
-
-                // Columna de la sección
-                const sectionCell = document.createElement('td');
-                sectionCell.textContent = selectedSection;
-
-                // Columna de acciones (Eliminar)
-                const actionCell = document.createElement('td');
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Eliminar';
-                deleteButton.onclick = function() {
-                    tableBody.removeChild(row);
+                // Crear objeto documento
+                const documentData = {
+                    name: file.name,
+                    url: URL.createObjectURL(file),
+                    section: selectedSection
                 };
-                actionCell.appendChild(deleteButton);
 
-                // Agregar las celdas a la fila
-                row.appendChild(nameCell);
-                row.appendChild(sectionCell);
-                row.appendChild(actionCell);
+                // Añadir el documento a la tabla
+                addDocumentToTable(documentData);
 
-                // Agregar la fila a la tabla
-                tableBody.appendChild(row);
+                // Guardar el documento en LocalStorage
+                saveDocumentToStorage(documentData);
 
                 // Limpiar los campos
                 fileInput.value = '';
@@ -133,6 +121,61 @@
                 alert("Por favor selecciona un archivo y una sección.");
             }
         });
+
+        // Función para añadir un documento a la tabla
+        function addDocumentToTable(documentData) {
+            const row = document.createElement('tr');
+
+            // Columna del nombre del documento
+            const nameCell = document.createElement('td');
+            const link = document.createElement('a');
+            link.href = documentData.url;
+            link.textContent = documentData.name;
+            link.download = documentData.name;
+            nameCell.appendChild(link);
+
+            // Columna de la sección
+            const sectionCell = document.createElement('td');
+            sectionCell.textContent = documentData.section;
+
+            // Columna de acciones (Eliminar)
+            const actionCell = document.createElement('td');
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Eliminar';
+            deleteButton.onclick = function() {
+                documentTableBody.removeChild(row);
+                removeDocumentFromStorage(documentData.name);
+            };
+            actionCell.appendChild(deleteButton);
+
+            // Agregar las celdas a la fila
+            row.appendChild(nameCell);
+            row.appendChild(sectionCell);
+            row.appendChild(actionCell);
+
+            // Agregar la fila a la tabla
+            documentTableBody.appendChild(row);
+        }
+
+        // Función para guardar un documento en LocalStorage
+        function saveDocumentToStorage(documentData) {
+            let documents = JSON.parse(localStorage.getItem('documents')) || [];
+            documents.push(documentData);
+            localStorage.setItem('documents', JSON.stringify(documents));
+        }
+
+        // Función para cargar documentos desde LocalStorage
+        function loadDocumentsFromStorage() {
+            let documents = JSON.parse(localStorage.getItem('documents')) || [];
+            documents.forEach(addDocumentToTable);
+        }
+
+        // Función para eliminar un documento de LocalStorage
+        function removeDocumentFromStorage(documentName) {
+            let documents = JSON.parse(localStorage.getItem('documents')) || [];
+            documents = documents.filter(doc => doc.name !== documentName);
+            localStorage.setItem('documents', JSON.stringify(documents));
+        }
     </script>
 </body>
 </html>
