@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrador de Documentos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+        }
+        input[type="file"], select {
+            margin-bottom: 20px;
+            padding: 5px;
+            width: 100%;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Administrador de Documentos</h2>
+        <form id="uploadForm">
+            <label for="sectionSelect">Selecciona la Sección:</label>
+            <select id="sectionSelect" required>
+                <option value="">Selecciona una sección</option>
+                <option value="Finanzas">Finanzas</option>
+                <option value="Recursos Humanos">Recursos Humanos</option>
+                <option value="Proyectos">Proyectos</option>
+                <option value="Legal">Legal</option>
+            </select>
+
+            <label for="documentInput">Subir Documento:</label>
+            <input type="file" id="documentInput" accept=".pdf,.doc,.docx,.txt" required>
+            <button type="submit">Subir Documento</button>
+        </form>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre del Documento</th>
+                    <th>Sección</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="documentTableBody">
+                <!-- Los documentos subidos aparecerán aquí -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const fileInput = document.getElementById('documentInput');
+            const file = fileInput.files[0];
+            const sectionSelect = document.getElementById('sectionSelect');
+            const selectedSection = sectionSelect.value;
+
+            if (file && selectedSection) {
+                const tableBody = document.getElementById('documentTableBody');
+                const row = document.createElement('tr');
+
+                // Columna del nombre del documento
+                const nameCell = document.createElement('td');
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(file);
+                link.textContent = file.name;
+                link.download = file.name;
+                nameCell.appendChild(link);
+
+                // Columna de la sección
+                const sectionCell = document.createElement('td');
+                sectionCell.textContent = selectedSection;
+
+                // Columna de acciones (Eliminar)
+                const actionCell = document.createElement('td');
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Eliminar';
+                deleteButton.onclick = function() {
+                    tableBody.removeChild(row);
+                };
+                actionCell.appendChild(deleteButton);
+
+                // Agregar las celdas a la fila
+                row.appendChild(nameCell);
+                row.appendChild(sectionCell);
+                row.appendChild(actionCell);
+
+                // Agregar la fila a la tabla
+                tableBody.appendChild(row);
+
+                // Limpiar los campos
+                fileInput.value = '';
+                sectionSelect.value = '';
+            } else {
+                alert("Por favor selecciona un archivo y una sección.");
+            }
+        });
+    </script>
+</body>
+</html>
